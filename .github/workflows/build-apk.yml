@@ -72,12 +72,15 @@ jobs:
         with:
           name: MusicFreeTest.apk
 
-      - name: Create/replace release
+      - name: Publish APK to release
         run: |
-          gh release delete apk-latest --cleanup-tag 2>/dev/null || true
-          gh release create apk-latest MusicFreeTest.apk \
-            --title "MusicFreeTest APK (latest)" \
-            --prerelease \
-            --notes "Auto-built by GitHub Actions. Download the APK and install on an Android device (allow installing apps from unknown sources)."
+          if gh release view apk-latest >/dev/null 2>&1; then
+            gh release upload apk-latest MusicFreeTest.apk --clobber
+          else
+            gh release create apk-latest MusicFreeTest.apk \
+              --title "MusicFreeTest APK (latest)" \
+              --prerelease \
+              --notes "Auto-built by GitHub Actions. Download the APK and install on an Android device (allow installing apps from unknown sources)."
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
